@@ -1,0 +1,2 @@
+ALTER TABLE citas
+ADD COLUMN color VARCHAR(20) NULL AFTER notas;

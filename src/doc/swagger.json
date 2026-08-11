@@ -1,0 +1,1187 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.1.0",
+    "title": "PsicoGestion API",
+    "description": "Documentación completa de endpoints con autenticación JWT."
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT en formato: Bearer <token>"
+    }
+  },
+  "tags": [
+    { "name": "Authentication" },
+    { "name": "Agenda" },
+    { "name": "Altas" },
+    { "name": "Asignaciones" },
+    { "name": "Citas" },
+    { "name": "Configuracion" },
+    { "name": "Dashboard" },
+    { "name": "Disponibilidad" },
+    { "name": "Expedientes" },
+    { "name": "Fundaciones" },
+    { "name": "Notificaciones" },
+    { "name": "Observaciones" },
+    { "name": "Pacientes" },
+    { "name": "Preregistro" },
+    { "name": "Reportes" },
+    { "name": "Roles" },
+    { "name": "Sesiones" },
+    { "name": "Estadisticas" },
+    { "name": "Usuarios" }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root endpoint",
+        "description": "Confirma que el servidor está activo.",
+        "responses": {
+          "200": {
+            "description": "Server is running"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/LoginCredentials" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login exitoso", "schema": { "$ref": "#/definitions/LoginResponse" } },
+          "400": { "description": "Datos incompletos" },
+          "401": { "description": "Credenciales inválidas" },
+          "500": { "description": "Error interno" }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Perfil del usuario autenticado",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Usuario", "schema": { "$ref": "#/definitions/User" } },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "No encontrado" }
+        }
+      }
+    },
+    "/api/agenda/global": {
+      "get": {
+        "tags": ["Agenda"],
+        "summary": "Agenda global",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Agenda", "schema": { "type": "array", "items": { "$ref": "#/definitions/AgendaItem" } } } }
+      }
+    },
+    "/api/agenda/diaria": {
+      "get": {
+        "tags": ["Agenda"],
+        "summary": "Agenda diaria",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Agenda", "schema": { "type": "array", "items": { "$ref": "#/definitions/AgendaItem" } } } }
+      }
+    },
+    "/api/agenda/mensual": {
+      "get": {
+        "tags": ["Agenda"],
+        "summary": "Agenda mensual",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Agenda", "schema": { "type": "array", "items": { "$ref": "#/definitions/AgendaItem" } } } }
+      }
+    },
+    "/api/agenda/disponibilidad-profesionales": {
+      "get": {
+        "tags": ["Agenda"],
+        "summary": "Disponibilidad de profesionales",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Disponibilidad", "schema": { "type": "array", "items": { "$ref": "#/definitions/Disponibilidad" } } } }
+      }
+    },
+    "/api/agenda/cita/{id}/reprogramar": {
+      "put": {
+        "tags": ["Agenda"],
+        "summary": "Reprogramar cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }
+        ],
+        "responses": { "200": { "description": "Cita reprogramada" }, "400": { "description": "Solicitud inválida" } }
+      }
+    },
+    "/api/altas/proponer/{paciente_id}": {
+      "post": {
+        "tags": ["Altas"],
+        "summary": "Proponer alta de paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "paciente_id", "in": "path", "required": true, "type": "integer" },
+          { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }
+        ],
+        "responses": { "200": { "description": "Propuesta creada" } }
+      }
+    },
+    "/api/altas/{id}/procesar": {
+      "put": {
+        "tags": ["Altas"],
+        "summary": "Procesar propuesta de alta",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }
+        ],
+        "responses": { "200": { "description": "Propuesta procesada" } }
+      }
+    },
+    "/api/altas/estadisticas": {
+      "get": {
+        "tags": ["Altas"],
+        "summary": "Estadísticas de altas",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/altas": {
+      "post": {
+        "tags": ["Altas"],
+        "summary": "Dar de alta paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "201": { "description": "Alta registrada" } }
+      },
+      "get": {
+        "tags": ["Altas"],
+        "summary": "Listar altas",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Altas", "schema": { "type": "array", "items": { "$ref": "#/definitions/Alta" } } } }
+      }
+    },
+    "/api/altas/{id}": {
+      "get": {
+        "tags": ["Altas"],
+        "summary": "Detalle de alta",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Alta", "schema": { "$ref": "#/definitions/Alta" } } }
+      }
+    },
+    "/api/asignaciones": {
+      "post": {
+        "tags": ["Asignaciones"],
+        "summary": "Crear asignación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Asignacion" } }],
+        "responses": { "201": { "description": "Asignación creada" } }
+      },
+      "get": {
+        "tags": ["Asignaciones"],
+        "summary": "Asignaciones activas",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Asignaciones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Asignacion" } } } }
+      }
+    },
+    "/api/asignaciones/{id}/finalizar": {
+      "put": {
+        "tags": ["Asignaciones"],
+        "summary": "Finalizar asignación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Asignación finalizada" } }
+      }
+    },
+    "/api/asignaciones/paciente/{paciente_id}/historial": {
+      "get": {
+        "tags": ["Asignaciones"],
+        "summary": "Historial de asignaciones por paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Historial", "schema": { "type": "array", "items": { "$ref": "#/definitions/Asignacion" } } } }
+      }
+    },
+    "/api/asignaciones/becarios/{id}/horas": {
+      "post": {
+        "tags": ["Asignaciones"],
+        "summary": "Registrar horas de becario",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Horas registradas" } }
+      }
+    },
+    "/api/asignaciones/mis-pacientes": {
+      "get": {
+        "tags": ["Asignaciones"],
+        "summary": "Mis pacientes",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Pacientes", "schema": { "type": "array", "items": { "$ref": "#/definitions/Paciente" } } } }
+      }
+    },
+    "/api/asignaciones/mis-becarios": {
+      "get": {
+        "tags": ["Asignaciones"],
+        "summary": "Mis becarios",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Becarios", "schema": { "type": "array", "items": { "$ref": "#/definitions/User" } } } }
+      }
+    },
+    "/api/citas/citas-por-fecha": {
+      "get": {
+        "tags": ["Citas"],
+        "summary": "Citas por fecha",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "fecha", "in": "query", "required": false, "type": "string" }
+        ],
+        "responses": { "200": { "description": "Citas", "schema": { "type": "array", "items": { "$ref": "#/definitions/Cita" } } } }
+      }
+    },
+    "/api/citas/paciente/{paciente_id}": {
+      "get": {
+        "tags": ["Citas"],
+        "summary": "Citas por paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Citas", "schema": { "type": "array", "items": { "$ref": "#/definitions/Cita" } } } }
+      }
+    },
+    "/api/citas/reporte-mensual": {
+      "get": {
+        "tags": ["Citas"],
+        "summary": "Reporte mensual de citas",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "mes", "in": "query", "required": false, "type": "integer" },
+          { "name": "anio", "in": "query", "required": false, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Reporte", "schema": { "$ref": "#/definitions/Reporte" } } }
+      }
+    },
+    "/api/citas/estadisticas": {
+      "get": {
+        "tags": ["Citas"],
+        "summary": "Estadísticas de citas",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/citas/alta-paciente": {
+      "post": {
+        "tags": ["Citas"],
+        "summary": "Dar de alta paciente desde citas",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Paciente dado de alta" } }
+      }
+    },
+    "/api/citas/cita/{id}": {
+      "put": {
+        "tags": ["Citas"],
+        "summary": "Actualizar cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Cita" } }],
+        "responses": { "200": { "description": "Cita actualizada" } }
+      }
+    },
+    "/api/citas/nueva": {
+      "post": {
+        "tags": ["Citas"],
+        "summary": "Crear nueva cita",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Cita" } }],
+        "responses": { "201": { "description": "Cita creada" } }
+      }
+    },
+    "/api/configuracion": {
+      "get": {
+        "tags": ["Configuracion"],
+        "summary": "Obtener configuración",
+        "responses": { "200": { "description": "Configuración", "schema": { "type": "object", "additionalProperties": true } } }
+      },
+      "put": {
+        "tags": ["Configuracion"],
+        "summary": "Actualizar múltiples configuraciones",
+        "parameters": [{ "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Configuración actualizada" } }
+      }
+    },
+    "/api/configuracion/{categoria}": {
+      "get": {
+        "tags": ["Configuracion"],
+        "summary": "Obtener configuración por categoría",
+        "parameters": [{ "name": "categoria", "in": "path", "required": true, "type": "string" }],
+        "responses": { "200": { "description": "Configuración", "schema": { "type": "object", "additionalProperties": true } } }
+      },
+      "put": {
+        "tags": ["Configuracion"],
+        "summary": "Actualizar configuración por categoría",
+        "parameters": [{ "name": "categoria", "in": "path", "required": true, "type": "string" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Configuración actualizada" } }
+      }
+    },
+    "/api/dashboard/coordinador": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Dashboard coordinador",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Dashboard", "schema": { "$ref": "#/definitions/DashboardData" }, "examples": { "application/json": {
+          "success": true,
+          "data": {
+            "estadisticas": { "pacientes_activos": 10, "citas_hoy": 5, "px_atendidos_foraneos": 3, "px_atendidos_comunidad_cesun": 2, "px_atendidos_canalizaciones": 1, "px_atendidos_crisis": 0 },
+            "cancelaciones_mes": { "promedio": 20, "canceladas": 2, "completadas": 8, "total": 10, "motivos": [{ "motivo": "Falta de pago", "cantidad": 1 }] },
+            "citas_por_dia": [{ "dia": "lunes", "total_citas": 3, "completadas": 2, "canceladas": 1 }],
+            "top_terapeutas": [{ "id": 1, "nombre_completo": "Ana Pérez", "total_citas": 12, "citas_completadas": 10 }],
+            "completadas_por_kapi": [{ "psicologo_id": 1, "nombre": "Ana Pérez", "email": "ana.perez@example.com", "origen": "CESUN", "total_completadas": 10 }],
+            "completadas_por_origen": { "foraneos": 4, "comunidadCesun": 4, "canalizaciones": 2 },
+            "coterapeutas_con_carga": [{ "id": 3, "nombre_completo": "Juan López", "pacientes_asignados": 5, "citas_este_mes": 8 }],
+            "actividad_reciente": [{ "id": 123, "tipo_evento": "Cita creada", "fecha_evento": "2026-08-03T10:00:00Z", "usuario": "Ana Pérez" }],
+            "solicitudes_pendientes": [{ "id": 5, "nombre": "María Gómez", "email": "maria.gomez@example.com", "estado": "PENDIENTE" }],
+            "ultima_actualizacion": "2026-08-03T20:00:00.000Z"
+          }
+        } } } }
+      }
+    },
+    "/api/dashboard/psicologo": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Dashboard psicólogo",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Dashboard", "schema": { "$ref": "#/definitions/DashboardData" } } }
+      }
+    },
+    "/api/dashboard/becario": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Dashboard becario",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Dashboard", "schema": { "$ref": "#/definitions/DashboardData" } } }
+      }
+    },
+    "/api/dashboard/metricas-globales": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Métricas globales",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Métricas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/dashboard/aprobar-solicitud": {
+      "post": {
+        "tags": ["Dashboard"],
+        "summary": "Aprobar solicitud",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/SolicitudIngreso" } }],
+        "responses": { "200": { "description": "Solicitud aprobada" } }
+      }
+    },
+    "/api/dashboard/denegar-solicitud": {
+      "post": {
+        "tags": ["Dashboard"],
+        "summary": "Denegar solicitud",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/SolicitudIngreso" } }],
+        "responses": { "200": { "description": "Solicitud denegada" } }
+      }
+    },
+    "/api/disponibilidad": {
+      "post": {
+        "tags": ["Disponibilidad"],
+        "summary": "Crear disponibilidad",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Disponibilidad" } }],
+        "responses": { "201": { "description": "Disponibilidad creada" } }
+      }
+    },
+    "/api/disponibilidad/mi-disponibilidad": {
+      "get": {
+        "tags": ["Disponibilidad"],
+        "summary": "Mi disponibilidad",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Disponibilidad", "schema": { "type": "array", "items": { "$ref": "#/definitions/Disponibilidad" } } } }
+      }
+    },
+    "/api/disponibilidad/{id}": {
+      "put": {
+        "tags": ["Disponibilidad"],
+        "summary": "Actualizar disponibilidad",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Disponibilidad" } }],
+        "responses": { "200": { "description": "Disponibilidad actualizada" } }
+      }
+    },
+    "/api/disponibilidad/{id}/desactivar": {
+      "put": {
+        "tags": ["Disponibilidad"],
+        "summary": "Desactivar disponibilidad",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Disponibilidad desactivada" } }
+      }
+    },
+    "/api/disponibilidad/usuario/{usuario_id}": {
+      "get": {
+        "tags": ["Disponibilidad"],
+        "summary": "Disponibilidad por usuario",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "usuario_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Disponibilidad", "schema": { "type": "array", "items": { "$ref": "#/definitions/Disponibilidad" } } } }
+      }
+    },
+    "/api/disponibilidad/horarios-disponibles": {
+      "get": {
+        "tags": ["Disponibilidad"],
+        "summary": "Horarios disponibles",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Horarios disponibles", "schema": { "type": "array", "items": { "type": "object", "additionalProperties": true } } } }
+      }
+    },
+    "/api/expedientes/paciente/{paciente_id}/completo": {
+      "get": {
+        "tags": ["Expedientes"],
+        "summary": "Expediente completo",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Expediente", "schema": { "$ref": "#/definitions/Expediente" } } }
+      }
+    },
+    "/api/expedientes/paciente/{paciente_id}/resumen": {
+      "get": {
+        "tags": ["Expedientes"],
+        "summary": "Resumen de expediente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Resumen", "schema": { "$ref": "#/definitions/Expediente" } } }
+      }
+    },
+    "/api/expedientes/paciente/{paciente_id}": {
+      "post": {
+        "tags": ["Expedientes"],
+        "summary": "Crear expediente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Expediente" } }],
+        "responses": { "201": { "description": "Expediente creado" } }
+      },
+      "put": {
+        "tags": ["Expedientes"],
+        "summary": "Actualizar expediente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Expediente" } }],
+        "responses": { "200": { "description": "Expediente actualizado" } }
+      }
+    },
+    "/api/expedientes/paciente/{paciente_id}/nota-confidencial": {
+      "post": {
+        "tags": ["Expedientes"],
+        "summary": "Agregar nota confidencial",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Nota agregada" } }
+      }
+    },
+    "/api/fundaciones": {
+      "post": {
+        "tags": ["Fundaciones"],
+        "summary": "Crear fundación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Fundacion" } }],
+        "responses": { "201": { "description": "Fundación creada" } }
+      },
+      "get": {
+        "tags": ["Fundaciones"],
+        "summary": "Listar fundaciones",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Fundaciones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Fundacion" } } } }
+      }
+    },
+    "/api/fundaciones/{id}": {
+      "get": {
+        "tags": ["Fundaciones"],
+        "summary": "Detalle de fundación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Fundación", "schema": { "$ref": "#/definitions/Fundacion" } } }
+      },
+      "put": {
+        "tags": ["Fundaciones"],
+        "summary": "Actualizar fundación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Fundacion" } }],
+        "responses": { "200": { "description": "Fundación actualizada" } }
+      }
+    },
+    "/api/fundaciones/{id}/desactivar": {
+      "put": {
+        "tags": ["Fundaciones"],
+        "summary": "Desactivar fundación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Fundación desactivada" } }
+      }
+    },
+    "/api/notificaciones": {
+      "get": {
+        "tags": ["Notificaciones"],
+        "summary": "Mis notificaciones",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Notificaciones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Notificacion" } } } }
+      },
+      "post": {
+        "tags": ["Notificaciones"],
+        "summary": "Crear notificación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Notificacion" } }],
+        "responses": { "201": { "description": "Notificación creada" } }
+      }
+    },
+    "/api/notificaciones/recientes": {
+      "get": {
+        "tags": ["Notificaciones"],
+        "summary": "Notificaciones recientes",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Notificaciones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Notificacion" } } } }
+      }
+    },
+    "/api/notificaciones/{id}/leer": {
+      "put": {
+        "tags": ["Notificaciones"],
+        "summary": "Marcar notificación como leída",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Marcada como leída" } }
+      }
+    },
+    "/api/notificaciones/leer-todas": {
+      "put": {
+        "tags": ["Notificaciones"],
+        "summary": "Marcar todas como leídas",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Marcadas" } }
+      }
+    },
+    "/api/notificaciones/{id}": {
+      "delete": {
+        "tags": ["Notificaciones"],
+        "summary": "Eliminar notificación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Notificación eliminada" } }
+      }
+    },
+    "/api/observaciones": {
+      "post": {
+        "tags": ["Observaciones"],
+        "summary": "Crear observación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Observacion" } }],
+        "responses": { "201": { "description": "Observación creada" } }
+      }
+    },
+    "/api/observaciones/becario/{becario_id}": {
+      "get": {
+        "tags": ["Observaciones"],
+        "summary": "Observaciones de becario",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "becario_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Observaciones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Observacion" } } } }
+      }
+    },
+    "/api/observaciones/supervisor": {
+      "get": {
+        "tags": ["Observaciones"],
+        "summary": "Observaciones del supervisor",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Observaciones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Observacion" } } } }
+      }
+    },
+    "/api/observaciones/feedback/{becarioId}": {
+      "post": {
+        "tags": ["Observaciones"],
+        "summary": "Enviar feedback",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "becarioId", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Feedback enviado" } }
+      }
+    },
+    "/api/observaciones/{id}": {
+      "put": {
+        "tags": ["Observaciones"],
+        "summary": "Actualizar observación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Observacion" } }],
+        "responses": { "200": { "description": "Observación actualizada" } }
+      },
+      "delete": {
+        "tags": ["Observaciones"],
+        "summary": "Eliminar observación",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Observación eliminada" } }
+      }
+    },
+    "/api/pacientes": {
+      "get": {
+        "tags": ["Pacientes"],
+        "summary": "Listar pacientes",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Pacientes", "schema": { "type": "array", "items": { "$ref": "#/definitions/Paciente" } } } }
+      },
+      "post": {
+        "tags": ["Pacientes"],
+        "summary": "Crear paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Paciente" } }],
+        "responses": { "201": { "description": "Paciente creado" } }
+      }
+    },
+    "/api/pacientes/{id}": {
+      "get": {
+        "tags": ["Pacientes"],
+        "summary": "Detalle de paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Paciente", "schema": { "$ref": "#/definitions/Paciente" } } }
+      },
+      "put": {
+        "tags": ["Pacientes"],
+        "summary": "Actualizar paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Paciente" } }],
+        "responses": { "200": { "description": "Paciente actualizado" } }
+      },
+      "delete": {
+        "tags": ["Pacientes"],
+        "summary": "Eliminar paciente (soft-delete)",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Paciente inactivado" } }
+      }
+    },
+    "/api/pacientes/activos": {
+      "get": {
+        "tags": ["Pacientes"],
+        "summary": "Pacientes activos",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Pacientes", "schema": { "type": "array", "items": { "$ref": "#/definitions/Paciente" } } } }
+      }
+    },
+    "/api/pacientes/sin-asignar": {
+      "get": {
+        "tags": ["Pacientes"],
+        "summary": "Pacientes sin asignar",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Pacientes", "schema": { "type": "array", "items": { "$ref": "#/definitions/Paciente" } } } }
+      }
+    },
+    "/api/pacientes/candidatos-alta": {
+      "get": {
+        "tags": ["Pacientes"],
+        "summary": "Pacientes candidatos a alta",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Pacientes", "schema": { "type": "array", "items": { "$ref": "#/definitions/Paciente" } } } }
+      }
+    },
+    "/api/pacientes/{id}/marcar-no-aprobado": {
+      "post": {
+        "tags": ["Pacientes"],
+        "summary": "Marcar paciente como no aprobado",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Paciente actualizado" } }
+      }
+    },
+    "/api/pacientes/{id}/no-aprobar-alta": {
+      "post": {
+        "tags": ["Pacientes"],
+        "summary": "No aprobar alta de paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "Alta no aprobada" } }
+      }
+    },
+    "/api/preregistro": {
+      "post": {
+        "tags": ["Preregistro"],
+        "summary": "Crear solicitud de ingreso",
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/SolicitudIngreso" } }],
+        "responses": { "201": { "description": "Solicitud creada" } }
+      }
+    },
+    "/api/reportes/exportar-agenda-csv": {
+      "post": {
+        "tags": ["Reportes"],
+        "summary": "Exportar agenda a CSV",
+        "parameters": [{ "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "CSV generado" } }
+      }
+    },
+    "/api/reportes/exportar-disponibilidad-csv": {
+      "post": {
+        "tags": ["Reportes"],
+        "summary": "Exportar disponibilidad a CSV",
+        "parameters": [{ "in": "body", "name": "body", "schema": { "type": "object", "additionalProperties": true } }],
+        "responses": { "200": { "description": "CSV generado" } }
+      }
+    },
+    "/api/reportes/estadisticas": {
+      "post": {
+        "tags": ["Reportes"],
+        "summary": "Estadísticas para reportes",
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/ReporteFiltro" } }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/reportes/reporte-conflictos": {
+      "post": {
+        "tags": ["Reportes"],
+        "summary": "Reporte de conflictos",
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/ReporteFiltro" } }],
+        "responses": { "200": { "description": "Reporte generado" } }
+      }
+    },
+    "/api/reportes/generar": {
+      "post": {
+        "tags": ["Reportes"],
+        "summary": "Guardar reporte",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Reporte" } }],
+        "responses": { "201": { "description": "Reporte guardado" } }
+      }
+    },
+    "/api/reportes": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Listar reportes",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Reportes", "schema": { "type": "array", "items": { "$ref": "#/definitions/Reporte" } } } }
+      }
+    },
+    "/api/reportes/altas": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Reporte de altas",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "formato", "in": "query", "required": false, "type": "string" },
+          { "name": "fecha_inicio", "in": "query", "required": false, "type": "string" },
+          { "name": "fecha_fin", "in": "query", "required": false, "type": "string" }
+        ],
+        "responses": { "200": { "description": "Reporte de altas" } }
+      }
+    },
+    "/api/roles/my-permissions": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Permisos del usuario",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Permisos", "schema": { "type": "array", "items": { "type": "string" } } } }
+      }
+    },
+    "/api/roles/my-role-info": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Información del rol",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Rol", "schema": { "type": "object", "additionalProperties": true } } }
+      }
+    },
+    "/api/roles/check-permission/{permission}": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Verificar permiso",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "permission", "in": "path", "required": true, "type": "string" }],
+        "responses": { "200": { "description": "Resultado", "schema": { "type": "object", "additionalProperties": true } } }
+      }
+    },
+    "/api/sesiones": {
+      "post": {
+        "tags": ["Sesiones"],
+        "summary": "Registrar sesión",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Sesion" } }],
+        "responses": { "201": { "description": "Sesión registrada" } }
+      }
+    },
+    "/api/sesiones/paciente/{paciente_id}": {
+      "get": {
+        "tags": ["Sesiones"],
+        "summary": "Sesiones por paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Sesiones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Sesion" } } } }
+      }
+    },
+    "/api/sesiones/recientes": {
+      "get": {
+        "tags": ["Sesiones"],
+        "summary": "Sesiones recientes",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Sesiones", "schema": { "type": "array", "items": { "$ref": "#/definitions/Sesion" } } } }
+      }
+    },
+    "/api/sesiones/{id}": {
+      "get": {
+        "tags": ["Sesiones"],
+        "summary": "Detalle de sesión",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Sesión", "schema": { "$ref": "#/definitions/Sesion" } } }
+      },
+      "put": {
+        "tags": ["Sesiones"],
+        "summary": "Actualizar sesión",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/Sesion" } }],
+        "responses": { "200": { "description": "Sesión actualizada" } }
+      }
+    },
+    "/api/estadisticas/generales": {
+      "get": {
+        "tags": ["Estadisticas"],
+        "summary": "Estadísticas generales",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/estadisticas/reporte-comparativo": {
+      "get": {
+        "tags": ["Estadisticas"],
+        "summary": "Reporte comparativo",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Reporte comparativo" } }
+      }
+    },
+    "/api/estadisticas/psicologo": {
+      "get": {
+        "tags": ["Estadisticas"],
+        "summary": "Estadísticas de psicólogo",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/estadisticas/becario": {
+      "get": {
+        "tags": ["Estadisticas"],
+        "summary": "Estadísticas de becario",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/estadisticas/paciente/{paciente_id}": {
+      "get": {
+        "tags": ["Estadisticas"],
+        "summary": "Estadísticas de paciente",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "paciente_id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Estadísticas", "schema": { "$ref": "#/definitions/Estadisticas" } } }
+      }
+    },
+    "/api/users/becarios": {
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Listar becarios",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Becarios", "schema": { "type": "array", "items": { "$ref": "#/definitions/User" } } } }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Listar usuarios",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Usuarios", "schema": { "type": "array", "items": { "$ref": "#/definitions/User" } } } }
+      },
+      "post": {
+        "tags": ["Usuarios"],
+        "summary": "Crear usuario",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "body", "name": "body", "schema": { "$ref": "#/definitions/UserCreate" } }],
+        "responses": { "201": { "description": "Usuario creado" } }
+      }
+    },
+    "/api/users/{id}": {
+      "put": {
+        "tags": ["Usuarios"],
+        "summary": "Actualizar usuario",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }, { "in": "body", "name": "body", "schema": { "$ref": "#/definitions/UserUpdate" } }],
+        "responses": { "200": { "description": "Usuario actualizado" } }
+      },
+      "delete": {
+        "tags": ["Usuarios"],
+        "summary": "Eliminar usuario (soft-delete)",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "integer" }],
+        "responses": { "200": { "description": "Usuario inactivado" } }
+      }
+    }
+  },
+  "definitions": {
+    "LoginCredentials": {
+      "type": "object",
+      "required": ["email", "password"],
+      "properties": {
+        "email": { "type": "string", "example": "test@example.com" },
+        "password": { "type": "string", "example": "123456" }
+      }
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "message": { "type": "string", "example": "Login exitoso" },
+        "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+        "user": { "$ref": "#/definitions/User" }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer", "example": 1 },
+        "email": { "type": "string", "example": "test@example.com" },
+        "nombre": { "type": "string", "example": "Ana" },
+        "apellido": { "type": "string", "example": "López" },
+        "telefono": { "type": "string", "example": "5512345678" },
+        "rol": { "type": "string", "example": "psicologo" },
+        "especialidad": { "type": "string", "example": "Clínica" },
+        "activo": { "type": "boolean", "example": true }
+      }
+    },
+    "UserCreate": {
+      "type": "object",
+      "required": ["nombre", "apellido", "email", "password"],
+      "properties": {
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "email": { "type": "string" },
+        "telefono": { "type": "string" },
+        "rol": { "type": "string" },
+        "especialidad": { "type": "string" },
+        "fundacion_id": { "type": "integer" },
+        "activo": { "type": "boolean" },
+        "password": { "type": "string" }
+      }
+    },
+    "UserUpdate": {
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "email": { "type": "string" },
+        "telefono": { "type": "string" },
+        "rol": { "type": "string" },
+        "especialidad": { "type": "string" },
+        "fundacion_id": { "type": "integer" },
+        "activo": { "type": "boolean" },
+        "password": { "type": "string" }
+      }
+    },
+    "Paciente": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "email": { "type": "string" },
+        "telefono": { "type": "string" },
+        "fecha_inscripcion": { "type": "string" },
+        "genero": { "type": "string" },
+        "direccion": { "type": "string" },
+        "estado": { "type": "string" },
+        "activo": { "type": "boolean" },
+        "notas": { "type": "string" },
+        "fundacion_id": { "type": "integer" },
+        "motivo_consulta": { "type": "string" }
+      }
+    },
+    "Asignacion": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "paciente_id": { "type": "integer" },
+        "psicologo_id": { "type": "integer" },
+        "becario_id": { "type": "integer" },
+        "fecha_inicio": { "type": "string" },
+        "fecha_fin": { "type": "string" },
+        "estado": { "type": "string" }
+      }
+    },
+    "Cita": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "paciente_id": { "type": "integer" },
+        "psicologo_id": { "type": "integer" },
+        "becario_id": { "type": "integer" },
+        "fecha": { "type": "string" },
+        "hora_inicio": { "type": "string" },
+        "hora_fin": { "type": "string" },
+        "estado": { "type": "string" },
+        "tipo": { "type": "string" }
+      }
+    },
+    "Sesion": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "paciente_id": { "type": "integer" },
+        "psicologo_id": { "type": "integer" },
+        "fecha": { "type": "string" },
+        "notas": { "type": "string" }
+      }
+    },
+    "Expediente": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "paciente_id": { "type": "integer" },
+        "psicologo_id": { "type": "integer" },
+        "motivo_consulta": { "type": "string" }
+      }
+    },
+    "Disponibilidad": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "usuario_id": { "type": "integer" },
+        "dia_semana": { "type": "string" },
+        "hora_inicio": { "type": "string" },
+        "hora_fin": { "type": "string" },
+        "activo": { "type": "boolean" }
+      }
+    },
+    "Notificacion": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "titulo": { "type": "string" },
+        "mensaje": { "type": "string" },
+        "leido": { "type": "boolean" }
+      }
+    },
+    "Observacion": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "becario_id": { "type": "integer" },
+        "supervisor_id": { "type": "integer" },
+        "contenido": { "type": "string" }
+      }
+    },
+    "Fundacion": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "nombre": { "type": "string" },
+        "activo": { "type": "boolean" }
+      }
+    },
+    "Alta": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "paciente_id": { "type": "integer" },
+        "usuario_id": { "type": "integer" },
+        "fecha_alta": { "type": "string" },
+        "estado": { "type": "string" }
+      }
+    },
+    "Reporte": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "titulo": { "type": "string" },
+        "tipo": { "type": "string" },
+        "formato": { "type": "string" }
+      }
+    },
+    "ReporteFiltro": {
+      "type": "object",
+      "properties": {
+        "fecha_inicio": { "type": "string" },
+        "fecha_fin": { "type": "string" },
+        "tipo": { "type": "string" }
+      }
+    },
+    "AgendaItem": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "titulo": { "type": "string" },
+        "fecha": { "type": "string" },
+        "hora_inicio": { "type": "string" },
+        "hora_fin": { "type": "string" }
+      }
+    },
+    "DashboardData": {
+      "type": "object",
+      "properties": {
+        "estadisticas": { "type": "object", "additionalProperties": true },
+        "cancelaciones_mes": { "type": "object", "additionalProperties": true },
+        "citas_por_dia": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "top_terapeutas": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "completadas_por_kapi": { "type": "array", "items": { "$ref": "#/definitions/CompletadasPorKapiItem" } },
+        "completadas_por_origen": {
+          "type": "object",
+          "properties": {
+            "foraneos": { "type": "integer" },
+            "comunidadCesun": { "type": "integer" },
+            "canalizaciones": { "type": "integer" }
+          },
+          "additionalProperties": false
+        },
+        "coterapeutas_con_carga": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "actividad_reciente": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "solicitudes_pendientes": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "ultima_actualizacion": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "CompletadasPorKapiItem": {
+      "type": "object",
+      "properties": {
+        "psicologo_id": { "type": "integer" },
+        "nombre": { "type": "string" },
+        "email": { "type": "string" },
+        "origen": { "type": "string" },
+        "total_completadas": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "Estadisticas": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "SolicitudIngreso": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "email": { "type": "string" },
+        "motivo": { "type": "string" }
+      }
+    }
+  }
+}
